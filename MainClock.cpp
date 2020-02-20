@@ -20,7 +20,7 @@
 
 MainClock * mainClock;
 
-#define MAIN_TIMER_PERIOD 650
+#define MAIN_TIMER_PERIOD 10
 
 #include <arduino.h>
 
@@ -32,22 +32,22 @@ void MainClock::startTimer(void)
 
 	mainClock = this;
 	
-	TCCR1A =   (1<<WGM11) | (0<<WGM10);
-	TCCR1B = (2<<CS12) | (1<<CS11) | (0<<CS10)| ( 1<<WGM13 ) | (1<<WGM12 );
+	TCCR3A =   (1<<WGM31) | (0<<WGM30);
+	TCCR3B = (2<<CS32) | (1<<CS31) | (0<<CS30)| ( 1<<WGM33 ) | (1<<WGM32 );
 	
-	TCNT1H = 0;
-	TCNT1L = 0;
+	TCNT3H = 0;
+	TCNT3L = 0;
 
-	ICR1 = MAIN_TIMER_PERIOD;
+	ICR3 = MAIN_TIMER_PERIOD;
 
-    TIMSK1 |= (1 << TOIE1);
+    TIMSK3 |= (1 << TOIE3);
 
 
-	OCR1AH=0;
-	OCR1AL=0;
+	OCR3AH=0;
+	OCR3AL=0;
 
-	OCR1BH=0;
-	OCR1BL=0;
+	OCR3BH=0;
+	OCR3BL=0;
 
 
     sei();                      // enable global interrupt
