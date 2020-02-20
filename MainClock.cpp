@@ -20,12 +20,16 @@
 
 MainClock * mainClock;
 
+// Periode, in welcher ein Tick hochgezählt wird. 1000 steht hierbei für 100 ms.
 #define MAIN_TIMER_PERIOD 1000
 
 #include <arduino.h>
 
 unsigned int mainclockticks = 0;
 
+/* Aktuell für das Arduino Mega ausgelegt. Beim Nutzen mit einem Arduino Uno oder Arduino Duo etc. müssen die Ports angepasst werden (WGM31 zu WGM11 usw., nimmt dann
+ * anstatt Port 3 Port 1).
+ */
 void MainClock::startTimer(void) 
 {
 
@@ -59,8 +63,7 @@ void MainClock::startTimer(void)
 
 int MainClock::getTicks(void) 
 {
-  int temp = mainclockticks;
-  return temp;
+  return mainclockticks;
 }
 
 void MainClock::resetTicks() 
@@ -115,13 +118,11 @@ void MainClock::clearOverflow(void)
 
 
 
-
+/*
+ * Interrupt zum Erhöhen des Timers um eins. Dieser wird nach entsprechend definierten Zeiträumen (siehe oben, MAIN_TIMER_PERIOD) ausgelöst.
+ */
 ISR(TIMER3_OVF_vect) 
 {
 		mainClock->setTick();
     mainclockticks++;
-	
-	//ADCSRA |=(1<<ADSC);		// start ADC conversion
-	
-	
 }
