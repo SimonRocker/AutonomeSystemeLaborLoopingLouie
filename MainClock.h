@@ -34,6 +34,8 @@ public:
 
 	void setTick(void);
 	bool isTick(void);
+  int getTicks(void);
+  void resetTicks(void);
 	bool hasOverflow(void);
 	void clearOverflow(void);
 };

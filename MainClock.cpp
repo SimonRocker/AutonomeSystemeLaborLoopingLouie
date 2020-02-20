@@ -20,10 +20,11 @@
 
 MainClock * mainClock;
 
-#define MAIN_TIMER_PERIOD 10
+#define MAIN_TIMER_PERIOD 1000
 
 #include <arduino.h>
 
+unsigned int mainclockticks = 0;
 
 void MainClock::startTimer(void) 
 {
@@ -56,6 +57,16 @@ void MainClock::startTimer(void)
    
 }
 
+int MainClock::getTicks(void) 
+{
+  int temp = mainclockticks;
+  return temp;
+}
+
+void MainClock::resetTicks() 
+{
+  mainclockticks = 0;
+}
 
 void MainClock::setTick(void)
 {
@@ -107,17 +118,10 @@ void MainClock::clearOverflow(void)
 
 ISR(TIMER3_OVF_vect) 
 {
-static uint8_t preScaler;
-
-	if (preScaler & 0x2)
-	{
 		mainClock->setTick();
-		preScaler = 0;
-	}	
+    mainclockticks++;
 	
-	preScaler++;
-	
-	ADCSRA |=(1<<ADSC);		// start ADC conversion
+	//ADCSRA |=(1<<ADSC);		// start ADC conversion
 	
 	
 }

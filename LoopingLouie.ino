@@ -20,14 +20,16 @@ VL53L0X_RangingMeasurementData_t measure1;
 VL53L0X_RangingMeasurementData_t measure2;
 
 bool ready = true;
+bool erwarteFeuer = false;
 int threshold = 300;
 Servo servo;
 int valueFirstSensor = 1000;
 int valueSecondSensor = 1000;
-unsigned long time1 = 0;
-unsigned long time2 = 0;
+unsigned long millisZweiterSensor = 0;
+unsigned long millisErsterSensor = 0;
 int ticksSecondSensor = 0;
 int ticks = 0;
+int testMillis = 0;
 
 MainClock mainclk = MainClock();
 
@@ -119,20 +121,24 @@ void setup() {
 }
 
 void loop() {
-  //test();
-    if(mainclk.isTick()){
-      ticks++;
-    }
     //read_dual_sensors();
+    if(!erwarteFeuer) {
     peaksBerechnenUndAusgeben();
-
-    if(Serial.read()!=-1) {
+    } else { 
+      if(Serial.read()!=-1) {
       Serial.println("ZEIT:");
-      Serial.println(ticks - ticksSecondSensor);
-      Serial.println(millis() - time1);
+      ticks = mainclk.getTicks();
+      Serial.println(ticks);
       ticks = 0;
-      ticksSecondSensor = 0;
       feuer();
+      erwarteFeuer = false;
+    }
+    if(mainclk.getTicks() > 30000) {
+      Serial.println("ZEIT:");
+      ticks = -1;
+      Serial.println(ticks);
+      erwarteFeuer = false;
+    }
     }
 }
 
@@ -153,6 +159,7 @@ void feuer(){
     servo.write(110);
     delay(200);
     ready = false;
+    erwarteFeuer = false;
     laden();
   }
 }
@@ -161,38 +168,47 @@ void peaksBerechnenUndAusgeben() {
   lox1.rangingTest(&measure1, false); // pass in 'true' to get debug data printout!
   lox2.rangingTest(&measure2, false); // pass in 'true' to get debug data printout!
 
-  if(ticks - ticksSecondSensor > 15) {
+  if(millis() - millisErsterSensor > 500) {
   if(measure1.RangeMilliMeter < valueFirstSensor) {
     valueFirstSensor = measure1.RangeMilliMeter;
   } else if(valueFirstSensor < 335){
       Serial.println("ValueFirstSensor: "); 
       Serial.println(valueFirstSensor);
     valueFirstSensor = 1000;
+    millisErsterSensor = millis();
   }
+  }
+  if(millis() - millisZweiterSensor > 500) {
   if(measure2.RangeMilliMeter < valueSecondSensor) {
     valueSecondSensor = measure2.RangeMilliMeter;
   } else if(valueSecondSensor < 315){
       Serial.println("valueSecondSensor: "); 
       Serial.println(valueSecondSensor);
+      erwarteFeuer = true;
+      /*if(warteDelay(valueSecondSensor)) {
+      feuer();
+      } else {
+        erwarteFeuer = false;
+      }*/
       valueSecondSensor = 1000;
       Serial.println();
-      ticksSecondSensor = ticks;
-      time1 = millis();
+      mainclk.resetTicks();
+      millisZweiterSensor = millis();
   }
   }
   
 }
 
-void test() {
-  Serial.println("TESTING");
- while(ticks < 10000){
-    if(mainclk.isTick()){
-      ticks++;
-      Serial.println(ticks);
-    }
+bool warteDelay(int valueSensorZwei) {
+  int del = (71* valueSensorZwei - 19270) / 10;
+  if(del <= 0) {
+    return false;
+  } else {
+    delay(del);
+    return true;
   }
+  
 }
-
 
 /*bool berechneDelay(int value) {
   if(value > threshold - 20) {
