@@ -20,6 +20,7 @@ VL53L0X_RangingMeasurementData_t measure1;
 VL53L0X_RangingMeasurementData_t measure2;
 
 bool ready = true;
+bool testing = false;
 bool erwarteFeuer = false;
 int threshold = 300;
 Servo servo;
@@ -138,8 +139,8 @@ void loop() {
     //read_dual_sensors();
     if(!erwarteFeuer) {
     peaksBerechnenUndAusgeben();
-    } else { 
-      /*if(Serial.read()!=-1) {
+    } else if(testing){ 
+      if(Serial.read()!=-1) {
       Serial.println("ZEIT:");
       ticks = mainclk.getTicks();
       Serial.println(ticks);
@@ -154,7 +155,7 @@ void loop() {
       Serial.println(ticks);
       Serial.println();
       erwarteFeuer = false;
-    }*/
+    }
     }
 }
 
@@ -226,11 +227,13 @@ void peaksBerechnenUndAusgeben() {
       // Hier wird die ermittelte Gerade genutzt und je nach dem entweder gefeuert (sofern ein Wert ermittelt werden konnte) oder nichts getan (z.B. 
       // wenn das Flugzeug zu hoch fliegt). Wenn man Testdaten generieren will muss dies auskommentiert werden. Aktuell wird die Methode mit nur den Daten vom zweiten Sensor
       // benutzt. Für das Nutzen der anderen Methode einfach die zweite If Bedingung einkommentieren und statt der ersten nutzen.
+      if(!testing) {
       if(warteDelay(valueSecondSensor)) {
       //if(warteDelay2(valueFirstSensor, valueSecondSensor)) {
       feuer();
       } else {
         erwarteFeuer = false;
+      }
       }
       valueFirstSensor = 1000;
       valueSecondSensor = 1000;
