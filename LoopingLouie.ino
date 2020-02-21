@@ -224,8 +224,10 @@ void peaksBerechnenUndAusgeben() {
       Serial.println(valueSecondSensor);
       erwarteFeuer = true;
       // Hier wird die ermittelte Gerade genutzt und je nach dem entweder gefeuert (sofern ein Wert ermittelt werden konnte) oder nichts getan (z.B. 
-      // wenn das Flugzeug zu hoch fliegt). Wenn man Testdaten generieren will muss dies auskommentiert werden.
+      // wenn das Flugzeug zu hoch fliegt). Wenn man Testdaten generieren will muss dies auskommentiert werden. Aktuell wird die Methode mit nur den Daten vom zweiten Sensor
+      // benutzt. Für das Nutzen der anderen Methode einfach die zweite If Bedingung einkommentieren und statt der ersten nutzen.
       if(warteDelay(valueSecondSensor)) {
+      //if(warteDelay2(valueFirstSensor, valueSecondSensor)) {
       feuer();
       } else {
         erwarteFeuer = false;
@@ -250,8 +252,22 @@ void peaksBerechnenUndAusgeben() {
  * Zudem wird die berechnete Zeitspanne dann auch noch gewartet.
  */
 bool warteDelay(int valueSensorZwei) {
-  //int del = (71* valueSensorZwei - 19270);
   int del = (85* valueSensorZwei) / 100 - 105;
+  if(del <= 0) {
+    return false;
+  } else {
+    delay(del);
+    return true;
+  }
+ 
+}
+/*
+ * Ähnlich wie die vorangegangene Methode ist auch diese dafür da, den zeitlichen Versatz zwischen zweitem Peak und Auslösen des Hebelarms zu berechnen und abzuwarten.
+ * Dafür wird nun eine multiple Regression mit zwei Parametern genutzt. So können die Werte beider Sensoren in die Berechnung mit einfließen. 
+ * Die Werte wurden, genauso wie bei warteDelay() mithilfe der Testdaten im Excel Sheet berechnet (vgl. Doku).
+ */
+bool warteDelay2(int valueSensorEins, int valueSensorZwei) {
+  int del = ((1113 * valueSensorEins) / 1000) - ((950 * valueSensorZwei) / 1000) + 101;
   if(del <= 0) {
     return false;
   } else {
