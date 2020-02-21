@@ -129,11 +129,11 @@ void setup() {
 
 /*
  * Loop Methode, welche nach der Setup Methode immer wieder ausgeführt wird. Aktuell dauert ein Durchlauf ca 80-90 ms. 
- * Um Testdaten zu generieren den auskommentierten Code wieder einkommentieren und in der Methode peaksBerechnenUndAusgeben() einen Teil des Codes auskommentieren (dieser 
- * ist dort beschrieben). Jegliche Eingabe (z.B. Enter) löst nun den Hebelarm aus, wenn für den zweiten Sensor ein Wert ermittelt wurde. Die Ausgabe beinhaltet dann den Wert
- * des ersten Peaks, den Wert des zweiten Peaks und den zeitlichen Versatz von zweitem Peak und Auslösen des Hebelarms. Wenn nach 3 Sekunden nach Erhalten eines Wertes für 
- * zweiten Sensor keine Eingabe festgestellt wurde, wird der Zeitpunkt auf -1 gesetzt. Dies ist somit unserer Fehlerfall/ Wert für den Fall, dass das Flugzeug zu hoch ist um
- * es zu treffen/ nicht ausgelöst wurde. Während auf eine Eingabe gewartet wird, werden die Sensordaten nicht ausgewertet.
+ * Um Testdaten zu generieren den bool testing auf true setzen. Jegliche Eingabe (z.B. Enter) löst nun den Hebelarm aus, wenn für den zweiten Sensor ein Wert ermittelt wurde. 
+ * Die Ausgabe beinhaltet dann den Wert des ersten Peaks, den Wert des zweiten Peaks und den zeitlichen Versatz von zweitem Peak und Auslösen des Hebelarms. 
+ * Wenn nach 3 Sekunden nach Erhalten eines Wertes für zweiten Sensor keine Eingabe festgestellt wurde, wird der Zeitpunkt auf -1 gesetzt. 
+ * Dies ist somit unserer Fehlerfall/ Wert für den Fall, dass das Flugzeug zu hoch ist um es zu treffen/ nicht ausgelöst wurde. 
+ * Während auf eine Eingabe gewartet wird, werden die Sensordaten nicht ausgewertet.
  */
 void loop() {
     //read_dual_sensors();
@@ -225,7 +225,7 @@ void peaksBerechnenUndAusgeben() {
       Serial.println(valueSecondSensor);
       erwarteFeuer = true;
       // Hier wird die ermittelte Gerade genutzt und je nach dem entweder gefeuert (sofern ein Wert ermittelt werden konnte) oder nichts getan (z.B. 
-      // wenn das Flugzeug zu hoch fliegt). Wenn man Testdaten generieren will muss dies auskommentiert werden. Aktuell wird die Methode mit nur den Daten vom zweiten Sensor
+      // wenn das Flugzeug zu hoch fliegt). Für Testdaten den bool testing auf true setzen. Aktuell wird die Methode mit nur den Daten vom zweiten Sensor
       // benutzt. Für das Nutzen der anderen Methode einfach die zweite If Bedingung einkommentieren und statt der ersten nutzen.
       if(!testing) {
       if(warteDelay(valueSecondSensor)) {
